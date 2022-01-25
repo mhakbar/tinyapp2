@@ -20,6 +20,14 @@ function generateRandomString() {
   
 };
 //////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////DELETE SHORT-URL//////////////////////////////////////////////////
+app.post("/urls/:shortURL/delete", (req, res) => {
+  console.log(req.params);
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect("/urls")
+});
 ////////////////////////////////POST REQUEST FOR NEW URLs/////////////////////////////////////
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));

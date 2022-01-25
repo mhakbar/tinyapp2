@@ -33,4 +33,12 @@ app.get("/urls.json", (req, res) => {
 
 /*Note: visit: http://localhost:8080/urls.json,to see a JSON string representing 
 the entire urlDatabase object*/
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////Hello World///////////////////////////////////////////////
+app.get("/hello", (req, res) => {
+  res.send("<html><body>Hello <b>World</b></body></html>\n");
+});
+
+/*Note: visit http://localhost:8080/hello to see the result */
 

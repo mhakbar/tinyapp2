@@ -20,12 +20,7 @@ app.get("/urls", (req, res) => {
 });
 
 /*Note: use http://localhost:8080/urls to view URLs. This code is used for handling the route. key is "urls".*/
-/////////////Second route///////////////////
-app.get("/urls/:shortURL", (req, res) => {
-  console.log(req.params.longURL);
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]/* What goes here? */ };
-  res.render("urls_show", templateVars);
-});
+
 ////////////////////////////////////////MAIN PAGE///////////////////////////////////////////
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -68,6 +63,19 @@ app.get("/hello", (req, res) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////NEW URL PAGE////////////////////////////////////////////////////////
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+//Note:  a GET route to render the urls_new.ejs template (given below) in the browser
 
 
 
+
+/////////////Second route///////////////////
+app.get("/urls/:shortURL", (req, res) => {
+  console.log(req.params.longURL);
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]/* What goes here? */ };
+  res.render("urls_show", templateVars);
+});

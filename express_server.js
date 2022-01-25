@@ -29,8 +29,14 @@ request body from a Buffer into string that we can read. It will then add the da
 req(request) object under the key body.*/
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  let longURL = req.body.longURL;
+  let shortURL = generateRandomString();
+  urlDatabase[shortURL] = longURL;
+  res.status(404);
+  res.redirect(`/urls/${shortURL}`);
+  
+  // console.log(req.body);  // Log the POST request body to the console
+  // res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
 /////////passing urlDatabase to express_server.js template/////
@@ -100,4 +106,13 @@ app.get("/urls/:shortURL", (req, res) => {
   console.log(req.params.longURL);
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]/* What goes here? */ };
   res.render("urls_show", templateVars);
+
 });
+
+////////////////////////Route to LONG URL page///////////////////////////////////////////////////
+app.get("/u/:shortURL", (req, res) => {
+  // const longURL = ...
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
+

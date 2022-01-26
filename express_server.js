@@ -1,10 +1,15 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+const bodyParser = require("body-parser");//body parser required to take information from forms.
+app.use(bodyParser.urlencoded({extended: true}));
+/*Note: needs to be added before all the page routes. The body-parser library will convert the 
+request body from a Buffer into string that we can read. It will then add the data to the 
+req(request) object under the key body.*/
 
 app.set("view engine", "ejs");//This tells the Express app to use EJS as its templating engine.
 
-/////////////////////////////////////URL Database//////////////////////////////////////////
+/////////////////////////////////////URL Database////////////////////////////////////////////
 
 /////////showing long and short URLs//////////
 const urlDatabase = {
@@ -21,40 +26,48 @@ function generateRandomString() {
 };
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////DELETE SHORT-URL//////////////////////////////////////////////////
+
+
+///////////////////////////////DELETE SHORT-URL///////////////////////////////////////////////
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
-  res.redirect("/urls")
+  res.redirect("/urls");
 });
 //////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////EDIT BUTTON to EDIT URL//////////////////////////////////////////
-app.post("/urls/:shortURL", (req,res) => {
-  const shortURL = req.params.shortURL;
-  res.redirect(`/urls/${shortURL}`);
+///////////////////////////////SUBMIT UPDATED URL/////////////////////////////////////////////
 
-});
+app.post("/urls/:shortURL/edit", (req,res) => {
+  let newURL = req.body.newURL;
+  let shortURL = req.params.shortURL;
+  urlDatabase[shortURL] = newURL;
+  res.redirect("/urls");
 
-////////////////////////////////POST REQUEST FOR NEW URLs/////////////////////////////////////
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
-
-/*Note: needs to be added before all the page routes. The body-parser library will convert the 
-request body from a Buffer into string that we can read. It will then add the data to the 
-req(request) object under the key body.*/
-
-app.post("/urls", (req, res) => {
-  let longURL = req.body.longURL;
-  let shortURL = generateRandomString();
-  urlDatabase[shortURL] = longURL;
-  res.status(404);
-  res.redirect(`/urls/${shortURL}`);
+  // const shortURL = req.params.shortURL;
+  // const longURL = urlDatabase[shortURL];
+  // urlDatabase.push({
+  //   shortURL: req.body.newURL
+  // })  
   
-  // console.log(req.body);  // Log the POST request body to the console
-  // res.send("Ok");         // Respond with 'Ok' (we will replace this)
+})
+///////////////////////////////NEW URL PAGE////////////////////////////////////////////////////////
+//////////////Second route///////////////
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
 });
 
-/////////passing urlDatabase to express_server.js template/////
+//Note:  a GET route to render the urls_new.ejs template (given below) in the browser
+///////////////////////////////EDIT BUTTON to go SHORT URL Page///////////////////////////////
+app.get("/urls/:shortURL", (req,res) => {
+  const templateVars = { shortURL: req.params.shortURL,
+                         longURL: urlDatabase[req.params.shortURL]
+                        };
+
+  const shortURL = req.params.shortURL;
+  res.render(`urls_show`, templateVars);
+
+});
+//////////////////////////////////////////////////////////////////////////////////////////////
 //////////////First route/////////////////
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
@@ -62,6 +75,22 @@ app.get("/urls", (req, res) => {
 });
 
 /*Note: use http://localhost:8080/urls to view URLs. This code is used for handling the route. key is "urls".*/
+
+
+
+
+////////////////////////////////POST REQUEST FOR NEW URLs/////////////////////////////////////
+app.post("/urls", (req, res) => {
+  let longURL = req.body.longURL;
+  let shortURL = generateRandomString();
+  urlDatabase[shortURL] = longURL;
+  res.redirect(`/urls/${shortURL}`);
+  
+});
+
+/////////passing urlDatabase to express_server.js template/////
+
+
 
 ////////////////////////////////////////MAIN PAGE///////////////////////////////////////////
 app.get("/", (req, res) => {
@@ -105,13 +134,7 @@ app.get("/hello", (req, res) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////NEW URL PAGE////////////////////////////////////////////////////////
-//////////////Second route///////////////
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
-});
 
-//Note:  a GET route to render the urls_new.ejs template (given below) in the browser
 
 
 

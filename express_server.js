@@ -2,12 +2,15 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");//body parser required to take information from forms.
+const cookieParser = require('cookie-parser')
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 /*Note: needs to be added before all the page routes. The body-parser library will convert the 
 request body from a Buffer into string that we can read. It will then add the data to the 
 req(request) object under the key body.*/
 
 app.set("view engine", "ejs");//This tells the Express app to use EJS as its templating engine.
+
 
 /////////////////////////////////////URL Database////////////////////////////////////////////
 
@@ -53,14 +56,21 @@ app.post("/urls/:shortURL/edit", (req,res) => {
 ///////////////////////////////NEW URL PAGE////////////////////////////////////////////////////////
 //////////////Second route///////////////
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase
+    // ... any other vars
+  };
+  res.render("urls_new", templateVars);
+  
+  
 });
 
 //Note:  a GET route to render the urls_new.ejs template (given below) in the browser
 ///////////////////////////////EDIT BUTTON to go SHORT URL Page///////////////////////////////
 app.get("/urls/:shortURL", (req,res) => {
   const templateVars = { shortURL: req.params.shortURL,
-                         longURL: urlDatabase[req.params.shortURL]
+                         longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"]
                         };
 
   const shortURL = req.params.shortURL;
@@ -70,7 +80,17 @@ app.get("/urls/:shortURL", (req,res) => {
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////First route/////////////////
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  // const templateVars = { urls: urlDatabase,
+  //  };
+  // res.render("urls_index", templateVars);
+  // console.log(req.cookies['username']);
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase
+    // ... any other vars
+  };
+  console.log(templateVars);
+  console.log("this is it: ",req.cookies['username']);
   res.render("urls_index", templateVars);
 });
 
@@ -142,7 +162,7 @@ app.get("/hello", (req, res) => {
 /////////////Third route///////////////////
 app.get("/urls/:shortURL", (req, res) => {
   console.log(req.params.longURL);
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]/* What goes here? */ };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]/* What goes here? */, username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 
 });
@@ -154,3 +174,20 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+/////////////////////////////////////////LOGIN USERNAME MAIN PAGE///////////////////////////////////////////
+app.post("/login", (req,res) => {
+  console.log("login working");
+  let username = req.body.Login;
+  console.log(username);
+  res.cookie('username',username);
+    res.redirect('/urls');
+})
+
+
+///////////////////////////////////////LOGOUT USERNAME MAIN PAGE//////////////////////////////////////////////
+app.post("/logout", (req,res) => {
+  console.log("workds");
+  let  username = req.cookies["username"];
+  res.clearCookie('username', username);
+  res.redirect('/urls');
+})

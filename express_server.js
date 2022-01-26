@@ -2,12 +2,14 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");//body parser required to take information from forms.
+const cookieParser = require('cookie-parser')
 app.use(bodyParser.urlencoded({extended: true}));
 /*Note: needs to be added before all the page routes. The body-parser library will convert the 
 request body from a Buffer into string that we can read. It will then add the data to the 
 req(request) object under the key body.*/
 
 app.set("view engine", "ejs");//This tells the Express app to use EJS as its templating engine.
+
 
 /////////////////////////////////////URL Database////////////////////////////////////////////
 
@@ -154,3 +156,11 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+/////////////////////////////////////////LOGIN MAIN PAGE///////////////////////////////////////////
+app.post("/login", (req,res) => {
+  console.log("login working");
+  let loginID = req.body.Login;
+  console.log(loginID);
+  res.cookie('username',loginID);
+  res.redirect('/urls');
+})

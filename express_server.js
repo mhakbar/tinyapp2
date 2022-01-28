@@ -79,6 +79,10 @@ app.post("/urls/:shortURL/edit", (req,res) => {
 ///////////////////////////////NEW URL PAGE////////////////////////////////////////////////////////
 //////////////Second route///////////////
 app.get("/urls/new", (req, res) => {
+
+  if (!req.cookies.user_id) {
+    return res.status(403).send("login first");
+  }
   const templateVars = {
     //username: req.cookies["username"],
     urls: urlDatabase,
@@ -219,18 +223,27 @@ app.post("/login", (req,res) => {
  
   
   const user = findUser(email);
-  console.log(user);
-  if (!user) {
-        return res.status(400).send("Incorrect credentials");
+  
+  // console.log(user.password);
+  // console.log(user);
+
+  if (!user || user.password !== password) {
+        return res.status(403).send("Incorrect username or password");
   }
+
+
   if (user.password === password) {
      res.cookie('user_id', user.id);
      return res.redirect("/urls");
   }
+  // } else {
+  //   return res.status(403).send("Incorrect username or password");
+
+  // }
   // let username = req.body.Login;
   // console.log(username);
   //res.cookie('username',username);
-})
+});
 
 
 ///////////////////////////////////////LOGOUT USERNAME MAIN PAGE//////////////////////////////////////////////

@@ -16,8 +16,9 @@ app.set("view engine", "ejs");//This tells the Express app to use EJS as its tem
 
 /////////showing long and short URLs//////////
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+
+  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", "userid": "userRandomID"},
+  "9sm5xK": {longURL: "http://www.google.com", "userid": "user2RandomID" }
 };
 //////////////////////////////////////////////
 
@@ -100,7 +101,7 @@ app.get("/urls/new", (req, res) => {
 ///////////////////////////////EDIT BUTTON to go SHORT URL Page///////////////////////////////
 app.get("/urls/:shortURL", (req,res) => {
   const templateVars = { shortURL: req.params.shortURL,
-                         longURL: urlDatabase[req.params.shortURL], 
+                         longURL: urlDatabase[req.params.shortURL].longURL, 
                          //username: req.cookies["username"]
                          user: users[req.cookies.user_id],
                          //email: users[req.cookies.user_id].email,
@@ -139,7 +140,10 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   let longURL = req.body.longURL;
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = longURL;
+  let user = users[req.cookies.user_id].id;
+  urlDatabase[shortURL] = { "longURL": longURL, "userid": user};
+  console.log(urlDatabase);
+  //urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/${shortURL}`);
   
 });

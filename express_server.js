@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");//body parser required to take informa
 const cookieParser = require('cookie-parser')
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+const bcrypt = require('bcryptjs');
+
 /*Note: needs to be added before all the page routes. The body-parser library will convert the 
 request body from a Buffer into string that we can read. It will then add the data to the 
 req(request) object under the key body.*/
@@ -27,12 +29,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
  "user2RandomID": {
     id: "user2RandomID", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", 10)
   }
 }
 
@@ -255,21 +257,22 @@ app.get("/login", (req,res) => {
 app.post("/login", (req,res) => {
   console.log("login working");
   const email = req.body.email_L;
-  const password = req.body.password_L;
- 
+  const password = req.body.password_L; 
   
   const user = findUser(email);
+
+  const passwordMatching = bcrypt.compareSync(password, user.password);
   
 
-  if (!user || user.password !== password) {
+  if (!user || !passwordMatching) {
         return res.status(403).send("Incorrect username or password");
   }
 
 
-  if (user.password === password) {
+  
      res.cookie('user_id', user.id);
      return res.redirect("/urls");
-  }
+  
   // } else {
   //   return res.status(403).send("Incorrect username or password");
 
@@ -284,7 +287,14 @@ app.post("/login", (req,res) => {
 app.post("/logout", (req,res) => {
   //let  username = req.cookies["username"];
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  const userId = req.cookies.user_id;
+  // let urls =  urlDatabase[req.params.shortURL]
+  // const templateVars = {
+  //   user: userId,
+  //   urls
+  // }
+  res.redirect('/login');
+  // res.render("urls_index", templateVars);
 })
 
 
@@ -307,6 +317,7 @@ app.post("/register", (req,res) => {
   
   let email = req.body.email;
   let password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (!email || !password) {
     return res.status(400).send("Email and Password cannot be blank");
@@ -320,7 +331,7 @@ app.post("/register", (req,res) => {
   users[id] = {
     id: id,
     email: email,
-    password: password
+    password: hashedPassword
   }
 
   res.cookie('user_id',id);

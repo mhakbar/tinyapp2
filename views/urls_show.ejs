@@ -8,20 +8,22 @@
 
 <body>
   <%- include('partials/_header') %>
+  <%= user %>
   <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+        
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+        
       </div>
       
     <div class="card-footer text-muted">
-      <h2>Edit</h2>
+      
     
       <form method="POST" action ="/urls/<%= shortURL %>/edit">
-        <label for ="newURL">New URL: </label>
-        <input name = "newURL" id = "newURL" type="text"> 
-        <button name = "Submit" type = "submit" class ="btn btn-primary">Submit</button></input></form>
+        <label for ="newURL">TinyURL for: </label>
+        <input name = "newURL" id = "newURL" type="text" value = "<%= longURL %>"> 
+        <button name = "Submit" type = "submit" class ="btn btn-primary">Edit</button></input></form>
     
   </div>
   <!-- Bootstrap JS -->

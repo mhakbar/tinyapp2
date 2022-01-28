@@ -55,19 +55,35 @@ const findUser = (email) => {
 }
 
 
+
+
 ///////////////////////////////DELETE SHORT-URL///////////////////////////////////////////////
 app.post("/urls/:shortURL/delete", (req, res) => {
+  const userId = req.cookies.user_id;
+
+  if (!userId) {
+    res.status(401).send("Please Login");
+
+  } else {
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
   res.redirect("/urls");
+  }
 });
 //////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////SUBMIT UPDATED URL/////////////////////////////////////////////
 
 app.post("/urls/:shortURL/edit", (req,res) => {
+  const userId = req.cookies.user_id;
+
+  if (!userId) {
+    res.status(401).send("Please Login");
+
+  } else {
   let newURL = req.body.newURL;
   let shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = newURL;
+  //let user = req.cookies["user_id"];
+  urlDatabase[shortURL] = { "longURL": newURL, "userid": user};
   res.redirect("/urls");
 
   // const shortURL = req.params.shortURL;
@@ -75,11 +91,12 @@ app.post("/urls/:shortURL/edit", (req,res) => {
   // urlDatabase.push({
   //   shortURL: req.body.newURL
   // })  
-  
+  }
 })
 ///////////////////////////////NEW URL PAGE////////////////////////////////////////////////////////
 //////////////Second route///////////////
 app.get("/urls/new", (req, res) => {
+
 
   if (!req.cookies.user_id) {
     return res.status(403).send("login first");
@@ -100,6 +117,11 @@ app.get("/urls/new", (req, res) => {
 //Note:  a GET route to render the urls_new.ejs template (given below) in the browser
 ///////////////////////////////EDIT BUTTON to go SHORT URL Page///////////////////////////////
 app.get("/urls/:shortURL", (req,res) => {
+  const userId = req.cookies["user_id"];
+
+      if (urlDatabase[req.params.shortURL].userid === userId) {   
+
+    
   const templateVars = { shortURL: req.params.shortURL,
                          longURL: urlDatabase[req.params.shortURL].longURL, 
                          //username: req.cookies["username"]
@@ -107,28 +129,39 @@ app.get("/urls/:shortURL", (req,res) => {
                          //email: users[req.cookies.user_id].email,
                         };
 
-  const shortURL = req.params.shortURL;
+  
   res.render(`urls_show`, templateVars);
+      }
 
 });
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////First route/////////////////
 app.get("/urls", (req, res) => {
-  // const templateVars = { urls: urlDatabase,
-  //  };
-  // res.render("urls_index", templateVars);
-  // console.log(req.cookies['username']);
-  const templateVars = {
-    //username: req.cookies["username"],
-    urls: urlDatabase,
-    user: users[req.cookies.user_id],
-    //email: users[req.cookies.user_id].email,
-    // ... any other vars
-  };
-  console.log(templateVars);
-  console.log()
- 
-  res.render("urls_index", templateVars);
+  const userId = req.cookies.user_id;
+  const userURLs = {};
+
+  if (!userId) {
+    res.status(401).send("Please Login");
+
+  } else {
+
+    for (const shortURL in urlDatabase) {
+      if (urlDatabase[shortURL].userid === userId) {
+        userURLs[shortURL] = urlDatabase[shortURL];
+
+      }
+
+    }
+
+    const templateVars = {
+      urls: userURLs,
+      user: users[userId],
+    };
+
+    console.log(templateVars);
+
+    res.render("urls_index", templateVars);
+  }
 });
 
 /*Note: use http://localhost:8080/urls to view URLs. This code is used for handling the route. key is "urls".*/
@@ -138,11 +171,11 @@ app.get("/urls", (req, res) => {
 
 ////////////////////////////////POST REQUEST FOR NEW URLs/////////////////////////////////////
 app.post("/urls", (req, res) => {
+  
   let longURL = req.body.longURL;
   let shortURL = generateRandomString();
-  let user = users[req.cookies.user_id].id;
+  let user = req.cookies["user_id"];
   urlDatabase[shortURL] = { "longURL": longURL, "userid": user};
-  console.log(urlDatabase);
   //urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/${shortURL}`);
   
@@ -198,7 +231,6 @@ app.get("/hello", (req, res) => {
 
 /////////////Third route///////////////////
 app.get("/urls/:shortURL", (req, res) => {
-  console.log(req.params.longURL);
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]/* What goes here? */, username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 
@@ -228,8 +260,6 @@ app.post("/login", (req,res) => {
   
   const user = findUser(email);
   
-  // console.log(user.password);
-  // console.log(user);
 
   if (!user || user.password !== password) {
         return res.status(403).send("Incorrect username or password");
@@ -252,7 +282,6 @@ app.post("/login", (req,res) => {
 
 ///////////////////////////////////////LOGOUT USERNAME MAIN PAGE//////////////////////////////////////////////
 app.post("/logout", (req,res) => {
-  console.log("workds");
   //let  username = req.cookies["username"];
   res.clearCookie('user_id');
   res.redirect('/urls');
@@ -293,9 +322,6 @@ app.post("/register", (req,res) => {
     email: email,
     password: password
   }
-
-  console.log(users);
-  console.log(res.cookie('user_id',id));
 
   res.cookie('user_id',id);
   res.redirect("/urls");

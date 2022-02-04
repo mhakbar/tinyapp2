@@ -1,12 +1,10 @@
-const getUserByEmail = require("..//tinyapp2/helper");
-const generateRandomString = require("..//tinyapp2/helper");
+const getUserByEmail = require("../tinyapp2/helper");
+const generateRandomString = require("../tinyapp2/helper");
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");//body parser required to take information from forms.
-const cookieParser = require('cookie-parser')
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
 const bcrypt = require('bcryptjs');
 const cookieSession = require('cookie-session');
 

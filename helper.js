@@ -9,6 +9,14 @@ const getUserByEmail = (email, users) => {
 }
 
 
+////////////////////////////////////RANDOM STRING GENERATOR//////////////////////////////////
+//stack overflow
+function generateRandomString() {
+  return Math.random().toString(36).substr(2, 6);
+
+};
+
+
 
 
 
@@ -16,3 +24,4 @@ const getUserByEmail = (email, users) => {
 
 
 module.exports = getUserByEmail;
+module.exports = generateRandomString;

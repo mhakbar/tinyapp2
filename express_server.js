@@ -1,4 +1,5 @@
 const getUserByEmail = require("..//tinyapp2/helper");
+const generateRandomString = require("..//tinyapp2/helper");
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -40,12 +41,7 @@ const users = {
   }
 }
 
-////////////////////////////////////RANDOM STRING GENERATOR//////////////////////////////////
-//stack overflow
-function generateRandomString() {
-  return Math.random().toString(36).substr(2, 6);
 
-};
 
 ///////////POST METHOD/////////////////////
 

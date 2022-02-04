@@ -1,5 +1,4 @@
-const getUserByEmail = require("../tinyapp2/helper");
-const generateRandomString = require("../tinyapp2/helper");
+const {getUserByEmail, generateRandomString} = require("../tinyapp2/helper");
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -90,9 +89,19 @@ app.post("/urls", (req, res) => {
 app.post("/login", (req, res) => {
   console.log("login working");
   const email = req.body.email_L;
+  
   const password = req.body.password_L;
+  console.log("this password:", password);
+  if (password === "" ||email === "") { 
+    return res.status(404).send("Password or e-mail value is missing");
+
+  } else {
+
+  
 
   const user = getUserByEmail(email, users);
+  console.log("lets see tinyAPP2", user);
+  
 
   const passwordMatching = bcrypt.compareSync(password, user.password);
 
@@ -104,7 +113,7 @@ app.post("/login", (req, res) => {
   req.session.user_id = user.id;
 
   return res.redirect("/urls");
-
+  }
 });
 
 
@@ -211,7 +220,7 @@ app.get("/urls", (req, res) => {
 
 ////////////////////////////////////////MAIN PAGE///////////////////////////////////////////
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/login");
 });
 
 
@@ -244,7 +253,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 ////////////////////////Route to LONG URL page///////////////////////////////////////////////////
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 

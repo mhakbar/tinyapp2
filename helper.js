@@ -1,4 +1,5 @@
 const getUserByEmail = (email, users) => {
+  
   for (const userId in users) {
     const user = users[userId];
     if (user.email === email) {
@@ -6,7 +7,7 @@ const getUserByEmail = (email, users) => {
     }
   }
   return null;
-}
+ }
 
 
 ////////////////////////////////////RANDOM STRING GENERATOR//////////////////////////////////
@@ -23,5 +24,4 @@ function generateRandomString() {
 
 
 
-module.exports = getUserByEmail;
-module.exports = generateRandomString;
+module.exports = {getUserByEmail, generateRandomString}

@@ -87,11 +87,8 @@ app.post("/urls", (req, res) => {
 
 
 app.post("/login", (req, res) => {
-  console.log("login working");
-  const email = req.body.email_L;
-  
+  const email = req.body.email_L;  
   const password = req.body.password_L;
-  console.log("this password:", password);
   if (password === "" ||email === "") { 
     return res.status(404).send("Password or e-mail value is missing");
 
@@ -100,7 +97,6 @@ app.post("/login", (req, res) => {
   
 
   const user = getUserByEmail(email, users);
-  console.log("lets see tinyAPP2", user);
   
 
   const passwordMatching = bcrypt.compareSync(password, user.password);
@@ -173,7 +169,6 @@ app.get("/urls/new", (req, res) => {
 ///////////////////////////////EDIT BUTTON to go SHORT URL Page///////////////////////////////
 app.get("/urls/:shortURL", (req, res) => {
   const userId = req.session.user_id;
-  console.log(userId);
 
   if (urlDatabase[req.params.shortURL].userid === userId) {
 
@@ -193,7 +188,6 @@ app.get("/urls/:shortURL", (req, res) => {
 //////////////First route/////////////////
 app.get("/urls", (req, res) => {
   const userId = req.session.user_id;
-  console.log(userId);
   const userURLs = {};
 
   if (!userId) {
@@ -209,8 +203,6 @@ app.get("/urls", (req, res) => {
       urls: userURLs,
       user: users[userId],
     };
-
-    console.log(templateVars);
 
     res.render("urls_index", templateVars);
   }
@@ -239,15 +231,12 @@ app.get("/hello", (req, res) => {
 /////////////Third route///////////////////
 app.get("/urls/:shortURL", (req, res) => {
   const userId = req.session.user_id;
-  console.log("this is the one:", users[userId]);
 
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
     user: users[userId]
   };
-
-  console.log("templateVars:", templateVars);
   res.render("urls_show", templateVars);
 });
 
